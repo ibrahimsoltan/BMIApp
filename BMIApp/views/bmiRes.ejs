@@ -1,0 +1,26 @@
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+    <%- include("./partials/nav.ejs") %>
+  <div class="BMI content">
+    <h2>BMI Result</h2>
+
+    <% if (users.length > 0) { %>
+      <% users.forEach(user => { %>
+        <h3 class="date">Date: <%= user.date %></h3>
+        <p class="userName">Name : <%= user.userName %></p>
+        <p class="weight">Weight : <%= user.weight %></p>
+        <p class="height">Height : <%= user.height %></p>
+        <p class="bmi">BMI : <%= user.bmi %></p>
+        <p class="status">Status : <%= user.bmiStatus %></p>
+      <% }) %>
+    <% } else { %>
+      <p>There are no BMIs to display...</p>
+    <% } %>
+    
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>
