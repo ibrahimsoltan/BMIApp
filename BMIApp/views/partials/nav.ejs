@@ -4,8 +4,16 @@
       <p>A BMI Calculator and Tracker Site</p>
     </div>
     <ul>
+      <% if(loggedIn){%>
       <li><a href="/allResults">BMI recent results</a></li>
+      <li><a href="/signout">sign out</a></li>
+
+      <% } %>
       <li><a href="/about">About</a></li>
       <li><a href="/bmi">New BMI</a></li>
+      <% if(!loggedIn) { %>
+      <li><a href="/signup">sign up</a></li>
+      <li><a href="/signin">sign in</a></li>
+      <% } %>
     </ul>
   </nav>

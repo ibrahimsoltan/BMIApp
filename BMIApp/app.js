@@ -1,11 +1,14 @@
 const express = require('express')
-const { result } = require('lodash')
 const mongoose  = require('mongoose')
 const morgan =  require('morgan')
-const User = require('./models/users')
-
+const cors = require("cors");
+const {UserData,User} = require('./models/users')
+const expressSession = require('express-session')
+const authMiddleware = require('./middleware/authMiddleware')
+const loginMiddleware = require("./middleware/redirectIfAuthenticatedMiddleware")
 // express app
 const app = express()
+app.use(express.json());
 
 const DbURI = 'mongodb+srv://user1:TestApp2022@cluster0.dp8rbp4.mongodb.net/UsersDb?retryWrites=true&w=majority'
 mongoose.connect(DbURI,
@@ -13,6 +16,16 @@ mongoose.connect(DbURI,
     .then(result => app.listen(3000))
     .catch(err => console.log(err)
 )
+/*we register the expressSession middleware in our app and
+pass in a configuration object with a value to secret property. secret string is
+used by the express-session package to sign and encrypt the session ID
+cookie being shared with the browser.*/
+app.use(expressSession({
+  secret: 'keyboard cat'
+  }))
+
+//We first declare a global variable loggedIn that will be accessible from all our EJS files. 
+global.loggedIn = null;
 
 
 // register view engine
@@ -26,80 +39,56 @@ app.use(morgan('tiny'))
 //get the data from html
 app.use(express.urlencoded({extended:true}))
 
+/*we specify with the wildcard *,
+that on all requests, this middleware should be executed. In it, we assign
+loggedIn to req.session.userId.*/
+
+app.use("*", (req, res, next) => {
+  loggedIn = req.session.userId;
+  next()
+  });
+app.get('/signup',loginMiddleware, require("./controllers/singup"))
+app.post('/signup', require("./controllers/userSave"))
+
+app.post('/signuptest',async (req, res) => {
+  try {const user = new User(req.body)
+      await user.save()
+      req.session.userId = user._id
+      //res.redirect("/")
+    }
+    catch (error){
+      //const validationError = Object.keys(error.errors).map(key => error.errors[key].message)
+      //req.session.errors = validationError
+      console.error(error);
+      return error
+      //res.redirect("/signup")
+    }})
+
+app.get('/signin',loginMiddleware, require("./controllers/signin"))
+app.post('/signin',require("./controllers/signinUser"))
+
+app.get("/signout",require("./controllers/signout"))
+  
+
 app.get('/', (req, res) => {
   res.redirect('/bmi');
 });
+app.get('/about', require("./controllers/aboutPage"))
 
-app.get('/about', (req, res) => {
-res.render('about', { title: 'About' })
-});
-
-app.get('/bmi', (req, res) => {
-  res.render('addData', { title: 'Add new bmi' })
-});
-
-//helper function
-function getDate(){
-  var currentdate = new Date(); 
-  var datetime = "Done at: " + currentdate.getDate() + "/"
-                  + (currentdate.getMonth()+1)  + "/" 
-                  + currentdate.getFullYear() + " @ "  
-                  + currentdate.getHours() + ":"  
-                  + currentdate.getMinutes() + ":" 
-                  + currentdate.getSeconds();;
-  return datetime
-}
-
-//helper function
-function getStatus(bmi){
-    if(bmi < 18.5)
-      return "Underweight"
-    else if (bmi < 25)
-      return "Healthy"
-    else if (bmi < 30)
-      return "Overweight"
-    else 
-      return "Obese"
-
-}
-
-app.post('/bmi' , (req,res)=>{
-    const user = new User(req.body)
-    var bmi = user.weight/((user.height/100)*(user.height/100))
-    user.bmi = bmi.toFixed(2)
-    user.date = getDate()
-    user.bmiStatus = getStatus(user.bmi)
-    user.save()
-    .then((result)=> {
-        res.redirect('/bmiRes')
-    })
-    .catch(err => {
-        console.log(err)
-      });
-  })
-
-app.get('/allResults', (req, res) => {
-    User.find().sort({ createdAt: -1 })
-      .then(result => {
-        res.render('result', { users: result, title: 'All BMIs' });
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  })
+const newBMIController = require("./controllers/newBMI")
+app.get('/bmi', newBMIController);
 
 
 
-app.get('/bmiRes', (req, res) => {
-  User.find().limit(1).sort({ createdAt: -1 })
-    .then(result => {
-      res.render('bmiRes', { users: result, title: 'All BMIs' })
-    })
-    .catch(err => {
-      console.log(err)
-    })
-})
+const setApp = require("./controllers/setBMI")
+app.post('/bmi' ,setApp)
 
+const allBMIsController = require("./controllers/getAllBMIs");
+app.get('/allResults',authMiddleware, allBMIsController)
+
+const bmiById = require("./controllers/getBMIById")
+app.get('/bmiRes/:id', bmiById) 
+ 
 // 404 page
 app.use((req, res) => {
   res.status(404).render('404', { title: '404' })

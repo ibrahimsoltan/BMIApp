@@ -1,0 +1,28 @@
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+  <%- include("./partials/nav.ejs") %>
+
+  <div class="signup content">
+    <% if(errors != null && errors.length > 0){ %>
+      <% for (var i = 0; i < errors.length; i++) { %>
+        <ul class="list-group"></ul>
+        <li ><%= errors[i] %></li>
+        <% } %>
+        <% } %>
+
+    <form action="/signup" method="post">
+      <label for="userName">Name:</label>
+      <input type="text" id="userName" name="userName" required>
+      <label for="password">password:</label> 
+      <input type="text" id="password" name="password" required>
+      <button>Submit</button>
+    </form>
+
+
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>

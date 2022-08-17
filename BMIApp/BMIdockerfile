@@ -1,0 +1,7 @@
+FROM node
+WORKDIR D:\dokcerImages
+COPY package.json D:\dokcerImages
+RUN npm install 
+COPY . D:\dokcerImages
+EXPOSE 9000
+CMD ["npm","app.js"]

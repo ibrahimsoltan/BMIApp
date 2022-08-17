@@ -3,16 +3,19 @@
 
 <body>
     <%- include("./partials/nav.ejs") %>
-  <div class="blogs content">
+  <div class="BMI content">
     <h2>BMI Results</h2>
 
-    <% if (users.length > 0) { %>
-      <% users.forEach(user => { %>
-        <h3 class="date">date: <%= user.date %></h3>
-        <p class="userName">Name : <%= user.userName %></p>
-        <p class="bmi">BMI : <%= user.bmi %></p>
-        <p class="status">Status : <%= user.bmiStatus %></p>
-
+    <% if (usersBMI.length > 0 ) { %>
+      <% usersBMI.forEach(BMI => { %>
+        <% if(BMI.userid == loggedIn) { %>
+        <a class = "single" href = "/bmiRes/<%= BMI._id %>" > 
+        <h3 class="date">date: <%= BMI.date %></h3>
+        <p class="userName">Name : <%= BMI.userName %></p>
+        <p class="bmi">BMI : <%= BMI.bmi %></p>
+        <p class="status">Status : <%= BMI.bmiStatus %></p>
+        </a>
+        <% } %>
       <% }) %>
     <% } else { %>
       <p>There are no BMIs to display...</p>
