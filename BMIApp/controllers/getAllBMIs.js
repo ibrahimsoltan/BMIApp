@@ -1,4 +1,4 @@
-const {UserData} = require('D:/NodeJS/BMIApp/models/users')
+const {UserData} = require('../models/users')
 module.exports = async(req, res) => {
     try {  
     const result = await UserData.find().sort({ createdAt: -1 })

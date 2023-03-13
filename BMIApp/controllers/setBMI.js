@@ -1,4 +1,4 @@
-const {UserData} = require('D:/NodeJS/BMIApp/models/users')
+const {UserData} = require('../models/users')
 //helper function
 function getDate(){
   var currentdate = new Date(); 

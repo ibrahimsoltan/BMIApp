@@ -1,4 +1,4 @@
-const {User} = require('D:/NodeJS/BMIApp/models/users')
+const {User} = require('../models/users')
 module.exports = async (req, res) => {
 try {const user = new User(req.body)
     await user.save()

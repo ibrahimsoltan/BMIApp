@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const {User} = require('D:/NodeJS/BMIApp/models/users')
+const {User} = require('../models/users')
 module.exports = (req, res) =>{
     const { userName, password } = req.body;
     User.findOne({userName:userName}, (error,user) => {

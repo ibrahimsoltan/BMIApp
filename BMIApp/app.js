@@ -10,12 +10,28 @@ const loginMiddleware = require("./middleware/redirectIfAuthenticatedMiddleware"
 const app = express()
 app.use(express.json());
 
-const DbURI = 'mongodb+srv://user1:TestApp2022@cluster0.dp8rbp4.mongodb.net/UsersDb?retryWrites=true&w=majority'
-mongoose.connect(DbURI,
-    { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(result => app.listen(3000))
-    .catch(err => console.log(err)
-)
+// const DbURI = 'mongodb+srv://user1:TestApp2022@cluster0.dp8rbp4.mongodb.net/UsersDb?retryWrites=true&w=majority'
+// mongoose.connect(DbURI,
+//     { useNewUrlParser: true, useUnifiedTopology: true })
+//     .then(result => app.listen(3000))
+//     .catch(err => console.log(err)
+// )
+
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://ibrahim:ibrahim1234@student.lmygtpz.mongodb.net/BankDB?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+client.connect(err => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  app.listen(3000, () => {
+    console.log('listening on port 3000');
+  });
+  // perform actions on the collection object
+});
 /*we register the expressSession middleware in our app and
 pass in a configuration object with a value to secret property. secret string is
 used by the express-session package to sign and encrypt the session ID
